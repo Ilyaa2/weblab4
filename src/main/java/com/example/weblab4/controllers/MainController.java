@@ -62,8 +62,8 @@ public class MainController {
 
         ResponseEntity<List<Dot>> a = new ResponseEntity<>(dotRepo.findAll(),responseHeaders,HttpStatus.OK);
 
-         */
-
+         return a;
+        */
         return dotRepo.findAll();
     }
 

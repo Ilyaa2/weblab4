@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         //отключить корс защиту
         http
-                .csrf().disable().cors().disable().sessionManagement().disable()
+                //.csrf().disable().cors().disable().sessionManagement().disable() - пока работает и без отключения
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS,"/dot").permitAll()
                 .antMatchers("/dot").hasRole(Role.USER.name())
@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .and()
                 .httpBasic();
+                //.formLogin();
     }
 
     @Bean
