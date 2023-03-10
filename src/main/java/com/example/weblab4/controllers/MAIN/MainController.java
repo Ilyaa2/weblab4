@@ -1,4 +1,4 @@
-package com.example.weblab4.controllers;
+package com.example.weblab4.controllers.MAIN;
 
 import com.example.weblab4.CalcVerdict;
 import com.example.weblab4.repository.DotRepo;
@@ -57,8 +57,19 @@ public class MainController {
 
          return a;
         */
+
         return dotRepo.findAll();
     }
+
+    @GetMapping(value="dots")
+    public ResponseEntity<List<Dot>> getDots(){
+        return new ResponseEntity<>(dotRepo.findAll(), HttpStatus.OK);
+    }
+
+
+
+
+
 
 //    Он указывает, что любой метод-обработчик в TacoController будет обрабатывать запросы, только если запрос
 //клиента содержит заголовок Accept со значением "application/json",
