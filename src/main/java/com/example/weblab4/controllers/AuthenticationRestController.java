@@ -6,6 +6,7 @@ import com.example.weblab4.jwt.UsernameAlreadyExistsException;
 import com.example.weblab4.model.User;
 import com.example.weblab4.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,10 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +33,7 @@ public class AuthenticationRestController {
         this.userService = userService;
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("login")
     public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
@@ -58,7 +57,8 @@ public class AuthenticationRestController {
         }
     }
 
-    @PostMapping("register")
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping(value = "register",consumes = {"*/*"} )
     public ResponseEntity<Map<Object,Object>> register(@RequestBody AuthenticationRequestDto requestDto){
         try{
             String username = requestDto.getUsername();
@@ -68,18 +68,42 @@ public class AuthenticationRestController {
                 throw new UsernameAlreadyExistsException("A user with the same name already exists");
             }
 
-            //регистрация и создаение токена
             User createdUser = userService.register(new User(username, requestDto.getPassword()));
             String token = jwtTokenProvider.createToken(createdUser.getUsername(), createdUser.getRole());
 
             Map<Object, Object> responce = new HashMap<>();
             responce.put("username", username);
             responce.put("token", token);
-            //return ResponseEntity<>().
             return new ResponseEntity<>(responce, HttpStatus.CREATED);
 
         } catch (UsernameAlreadyExistsException e){
             return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/register")
+    public ResponseEntity<?> optionsRegister(){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Methods","POST, OPTIONS");
+        responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
+        responseHeaders.set("Access-Control-Max-Age","3600");
+        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
+        return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173") // - ЭТО САМОЕ ВАЖНОЕ, БЕЗ НЕГО НИЧЕГО РАБОТАТЬ НЕ БУДЕТ
+    @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "login")
+    public ResponseEntity<?> optionsLogin(){
+        return getResponseEntityForOptions();
+    }
+
+    private ResponseEntity<?> getResponseEntityForOptions(){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
+        responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
+        responseHeaders.set("Access-Control-Max-Age","3600");
+        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
+        return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
     }
 }
