@@ -1,6 +1,7 @@
 package com.example.weblab4.domain;
 
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Min;
 
 @Entity
 @Table
+@Data
 @EqualsAndHashCode(of= {"id"})
 public class Dot {
     @Id
@@ -30,15 +32,8 @@ public class Dot {
 
     private String verdict;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Dot(){}
+    //public Dot(){}
 
     @Override
     public String toString() {
@@ -50,35 +45,4 @@ public class Dot {
                 '}';
     }
 
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getR() {
-        return r;
-    }
-
-    public void setR(double r) {
-        this.r = r;
-    }
-
-    public String getVerdict() {
-        return verdict;
-    }
-
-    public void setVerdict(String verdict) {
-        this.verdict = verdict;
-    }
 }

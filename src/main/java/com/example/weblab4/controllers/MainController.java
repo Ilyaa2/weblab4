@@ -24,7 +24,8 @@ public class MainController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping("dot")
+    @PostMapping(value = "dot",consumes="application/json")
+    @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public Dot saveDot(@RequestBody Dot dot){
         dot.setVerdict(CalcVerdict.calculate(dot));
@@ -33,24 +34,16 @@ public class MainController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("dot/{rad}")
+    @GetMapping(value = "dot/{rad}",produces = "application/json")
     @ResponseBody
     public List<Dot> getDotsById(@PathVariable("rad") double r){
         return dotRepo.findAllByREquals(r);
     }
 
-    /*
-    @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("dot")
-    @ResponseBody
-    public List<Dot> getAllDots(){
-        return dotRepo.findAll();
-    }
 
-     */
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping("dot")
+    @GetMapping(value = "dot",produces = "application/json")
     @ResponseBody
     public List<Dot> getAllDots(){
         /*
@@ -67,17 +60,22 @@ public class MainController {
         return dotRepo.findAll();
     }
 
+//    Он указывает, что любой метод-обработчик в TacoController будет обрабатывать запросы, только если запрос
+//клиента содержит заголовок Accept со значением "application/json",
+//и тем самым сообщает, что клиент может обрабатывать ответы только
+//в формате JSON.
 
+
+    //так что возможно headers надо убрать
     @CrossOrigin(origins = "http://localhost:5173")
     @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/dot")
     public ResponseEntity<?> options(){
-
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS, DELETE");
         responseHeaders.set("Access-Control-Allow-Headers","Content-Type, Authorization");
         responseHeaders.set("Access-Control-Max-Age","3600");
         responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
-
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
     }
+
 }
