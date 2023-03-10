@@ -1,6 +1,5 @@
 package com.example.weblab4.jwt;
 
-import com.example.weblab4.model.Role;
 import com.example.weblab4.model.Status;
 import com.example.weblab4.model.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,20 +18,12 @@ public final class JwtUserFactory {
         return new JwtUser(
                 user.getId(),
                 user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
                 user.getPassword(),
-                mapToGrantedAuthorities(new ArrayList<>(user.getRoles())),
+                new ArrayList<GrantedAuthority>(){{
+                    add(new SimpleGrantedAuthority(user.getRole().name()));
+                }},
                 user.getStatus().equals(Status.ACTIVE),
                 user.getUpdated()
         );
-    }
-
-    private static List<GrantedAuthority> mapToGrantedAuthorities(List<Role> userRoles) {
-        return userRoles.stream()
-                .map(role ->
-                        new SimpleGrantedAuthority(role.getName())
-                ).collect(Collectors.toList());
     }
 }

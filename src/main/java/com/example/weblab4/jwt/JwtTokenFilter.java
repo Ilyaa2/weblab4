@@ -18,6 +18,8 @@ public class JwtTokenFilter extends GenericFilterBean {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+
+    //ТУТ ОБРАБОТАТЬ ОШИБКУ И В RES ПОЛОЖИТЬ ПЛОХОЙ ОТВЕТ С КОММЕНТАРИЯМИ ОШИБКИ
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
             throws IOException, ServletException {

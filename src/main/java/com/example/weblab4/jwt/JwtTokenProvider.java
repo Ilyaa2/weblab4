@@ -34,7 +34,7 @@ public class JwtTokenProvider {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         return bCryptPasswordEncoder;
     }
 
@@ -44,10 +44,10 @@ public class JwtTokenProvider {
     }
 
     //Payload — это полезные данные, которые хранятся внутри JWT. Эти данные также называют JWT-claims (заявки).
-    public String createToken(String username, List<Role> roles) {
+    public String createToken(String username, Role role) {
 
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", getRoleNames(roles));
+        claims.put("role", getRoleName(role));
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -97,13 +97,15 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer_")) {
-            return bearerToken.substring(7, bearerToken.length());
+            //return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }
 
     public boolean validateToken(String token) {
         try {
+            //ВЫЧЛЕНЯЕМ ПОЛЯ ТОКЕНА, ЗАВОРАЧИВАЯ КАЖДЫЙ В ОБЪЕКТ CLAIMS И ЗАСОВЫВАЕМ В ЛИСТ
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
 
             if (claims.getBody().getExpiration().before(new Date())) {
@@ -116,12 +118,10 @@ public class JwtTokenProvider {
         }
     }
 
-    private List<String> getRoleNames(List<Role> userRoles) {
-        List<String> result = new ArrayList<>();
-
-        userRoles.forEach(role -> {
-            result.add(role.getName());
-        });
+    private List<String> getRoleName(Role userRole) {
+        List<String> result = new ArrayList<>(){{
+            add(userRole.name());
+        }};
 
         return result;
     }

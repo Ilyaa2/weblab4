@@ -3,7 +3,6 @@ package com.example.weblab4.service;
 import com.example.weblab4.model.Role;
 import com.example.weblab4.model.Status;
 import com.example.weblab4.model.User;
-import com.example.weblab4.repository.RoleRepo;
 import com.example.weblab4.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +16,14 @@ import java.util.List;
 @Slf4j
 public class UserServiceImpl implements UserService{
     private final UserRepo userRepository;
-    private final RoleRepo roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepo userRepository, RoleRepo roleRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepo userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
+    /*
     @Override
     public User register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
@@ -42,6 +39,12 @@ public class UserServiceImpl implements UserService{
         log.info("IN register - user: {} successfully registered", registeredUser);
 
         return registeredUser;
+    }
+
+     */
+    @Override
+    public User register(User user){
+        return null;
     }
 
     @Override
