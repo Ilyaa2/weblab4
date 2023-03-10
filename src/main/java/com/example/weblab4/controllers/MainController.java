@@ -1,8 +1,8 @@
-package com.example.weblab4.controllers.MAIN;
+package com.example.weblab4.controllers;
 
 import com.example.weblab4.CalcVerdict;
 import com.example.weblab4.repository.DotRepo;
-import com.example.weblab4.domain.Dot;
+import com.example.weblab4.model.Dot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,7 @@ public class MainController {
         this.dotRepo = dotRepo;
     }
 
+    /*
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping(value = "dot",consumes="application/json")
     @ResponseStatus(HttpStatus.CREATED)
@@ -30,8 +31,24 @@ public class MainController {
     public Dot saveDot(@RequestBody Dot dot){
         dot.setVerdict(CalcVerdict.calculate(dot));
         //System.out.println(dot);
-        return dotRepo.save(dot);
+        Dot processedDot = dotRepo.save(dot);
+        return processedDot;
     }
+
+     */
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping(value = "dot",consumes="application/json")
+    @ResponseBody
+    public ResponseEntity<Dot> saveDot(@RequestBody Dot dot){
+        dot.setVerdict(CalcVerdict.calculate(dot));
+        //System.out.println(dot);
+        try {
+            return new ResponseEntity<>(dotRepo.save(dot), HttpStatus.CREATED);
+        } catch(Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping(value = "dot/{rad}",produces = "application/json")
@@ -61,6 +78,7 @@ public class MainController {
         return dotRepo.findAll();
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping(value="dots")
     public ResponseEntity<List<Dot>> getDots(){
         return new ResponseEntity<>(dotRepo.findAll(), HttpStatus.OK);
@@ -89,4 +107,14 @@ public class MainController {
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
+    @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/dots")
+    public ResponseEntity<?> optionsForDots(){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
+        responseHeaders.set("Access-Control-Allow-Headers","Content-Type, Authorization");
+        responseHeaders.set("Access-Control-Max-Age","3600");
+        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
+        return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
+    }
 }

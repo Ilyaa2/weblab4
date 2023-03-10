@@ -1,6 +1,6 @@
 package com.example.weblab4;
 
-import com.example.weblab4.domain.Dot;
+import com.example.weblab4.model.Dot;
 
 public class CalcVerdict {
     public static String calculate(Dot dot) {

@@ -16,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,8 +59,10 @@ public class AuthenticationRestController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping(value = "register",consumes = {"*/*"} )
+    //@PostMapping(value = "register",consumes = {"*/*"} )
+    @PostMapping(value = "register")
     public ResponseEntity<Map<Object,Object>> register(@RequestBody AuthenticationRequestDto requestDto){
+        Map<Object, Object> responce = new HashMap<>();
         try{
             String username = requestDto.getUsername();
             User user = userService.findByUsername(username);
@@ -71,25 +74,33 @@ public class AuthenticationRestController {
             User createdUser = userService.register(new User(username, requestDto.getPassword()));
             String token = jwtTokenProvider.createToken(createdUser.getUsername(), createdUser.getRole());
 
-            Map<Object, Object> responce = new HashMap<>();
+
             responce.put("username", username);
             responce.put("token", token);
             return new ResponseEntity<>(responce, HttpStatus.CREATED);
-
         } catch (UsernameAlreadyExistsException e){
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+            responce.put("error", "Conflict");
+            responce.put("message", "The user with this name already exists");
+            responce.put("path", "/auth/register");
+            responce.put("status", 409);
+            responce.put("timestamp", new Date());
+            return new ResponseEntity<>(responce, HttpStatus.CONFLICT);
         }
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
     @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/register")
     public ResponseEntity<?> optionsRegister(){
+        /*
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Methods","POST, OPTIONS");
         responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
         responseHeaders.set("Access-Control-Max-Age","3600");
         responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
+
+         */
+        return getResponseEntityForOptions();
     }
 
     @CrossOrigin(origins = "http://localhost:5173") // - ЭТО САМОЕ ВАЖНОЕ, БЕЗ НЕГО НИЧЕГО РАБОТАТЬ НЕ БУДЕТ
@@ -100,7 +111,8 @@ public class AuthenticationRestController {
 
     private ResponseEntity<?> getResponseEntityForOptions(){
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
+        //responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
+        responseHeaders.set("Access-Control-Allow-Methods","POST, OPTIONS");
         responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
         responseHeaders.set("Access-Control-Max-Age","3600");
         responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");

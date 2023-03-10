@@ -1,4 +1,4 @@
-package com.example.weblab4.domain;
+package com.example.weblab4.model;
 
 
 import lombok.Data;
