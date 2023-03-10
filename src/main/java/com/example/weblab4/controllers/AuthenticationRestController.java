@@ -2,9 +2,11 @@ package com.example.weblab4.controllers;
 
 import com.example.weblab4.dto.AuthenticationRequestDto;
 import com.example.weblab4.jwt.JwtTokenProvider;
+import com.example.weblab4.jwt.UsernameAlreadyExistsException;
 import com.example.weblab4.model.User;
 import com.example.weblab4.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,6 +55,31 @@ public class AuthenticationRestController {
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
+        }
+    }
+
+    @PostMapping("register")
+    public ResponseEntity<Map<Object,Object>> register(@RequestBody AuthenticationRequestDto requestDto){
+        try{
+            String username = requestDto.getUsername();
+            User user = userService.findByUsername(username);
+
+            if (user != null){
+                throw new UsernameAlreadyExistsException("A user with the same name already exists");
+            }
+
+            //регистрация и создаение токена
+            User createdUser = userService.register(new User(username, requestDto.getPassword()));
+            String token = jwtTokenProvider.createToken(createdUser.getUsername(), createdUser.getRole());
+
+            Map<Object, Object> responce = new HashMap<>();
+            responce.put("username", username);
+            responce.put("token", token);
+            //return ResponseEntity<>().
+            return new ResponseEntity<>(responce, HttpStatus.CREATED);
+
+        } catch (UsernameAlreadyExistsException e){
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
     }
 }

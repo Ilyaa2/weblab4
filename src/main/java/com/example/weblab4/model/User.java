@@ -19,4 +19,13 @@ public class User extends BaseEntity {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public User(){
+
+    }
+
+    public User(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
 }
