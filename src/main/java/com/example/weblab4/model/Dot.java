@@ -1,6 +1,7 @@
 package com.example.weblab4.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,8 +33,10 @@ public class Dot {
 
     private String verdict;
 
-
-    //public Dot(){}
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable = false)
+    @JsonIgnore
+    private User user;
 
     @Override
     public String toString() {

@@ -1,11 +1,16 @@
 package com.example.weblab4.controllers;
 
-import com.example.weblab4.CalcVerdict;
+import com.example.weblab4.util.CalcVerdict;
+import com.example.weblab4.jwt.JwtUser;
+import com.example.weblab4.model.User;
 import com.example.weblab4.repository.DotRepo;
 import com.example.weblab4.model.Dot;
+import com.example.weblab4.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -17,31 +22,30 @@ import java.util.List;
 public class MainController {
 
     private DotRepo dotRepo;
+    private UserRepo userRepo;
+    private User user;
 
     @Autowired
-    public MainController(DotRepo dotRepo){
+    public MainController(DotRepo dotRepo, UserRepo userRepo){
         this.dotRepo = dotRepo;
+        this.userRepo = userRepo;
     }
 
-    /*
-    @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping(value = "dot",consumes="application/json")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public Dot saveDot(@RequestBody Dot dot){
-        dot.setVerdict(CalcVerdict.calculate(dot));
-        //System.out.println(dot);
-        Dot processedDot = dotRepo.save(dot);
-        return processedDot;
+
+    private void setUser(){
+        UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        this.user = userRepo.findById(((JwtUser) user.getPrincipal()).getId()).get();
     }
 
-     */
+
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping(value = "dot",consumes="application/json")
     @ResponseBody
     public ResponseEntity<Dot> saveDot(@RequestBody Dot dot){
+        setUser();
+
+        dot.setUser(user);
         dot.setVerdict(CalcVerdict.calculate(dot));
-        //System.out.println(dot);
         try {
             return new ResponseEntity<>(dotRepo.save(dot), HttpStatus.CREATED);
         } catch(Exception e){
@@ -53,63 +57,28 @@ public class MainController {
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping(value = "dot/{rad}",produces = "application/json")
     @ResponseBody
-    public List<Dot> getDotsById(@PathVariable("rad") double r){
-        return dotRepo.findAllByREquals(r);
+    public ResponseEntity<List<Dot>> getDotsById(@PathVariable("rad") double r){
+        setUser();
+        try {
+            return new ResponseEntity<>(dotRepo.findByUserAndR(user, r), HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
     }
-
-
 
     @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping(value = "dot",produces = "application/json")
     @ResponseBody
     public List<Dot> getAllDots(){
-        /*
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS, DELETE");
-        responseHeaders.set("Access-Control-Allow-Headers","Content-Type, Authorization");
-        responseHeaders.set("Access-Control-Max-Age","3600");
-        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
-
-        ResponseEntity<List<Dot>> a = new ResponseEntity<>(dotRepo.findAll(),responseHeaders,HttpStatus.OK);
-
-         return a;
-        */
-
-        return dotRepo.findAll();
-    }
-
-    @CrossOrigin(origins = "http://localhost:5173")
-    @GetMapping(value="dots")
-    public ResponseEntity<List<Dot>> getDots(){
-        return new ResponseEntity<>(dotRepo.findAll(), HttpStatus.OK);
+        setUser();
+        return dotRepo.findByUser(user);
     }
 
 
-
-
-
-
-//    Он указывает, что любой метод-обработчик в TacoController будет обрабатывать запросы, только если запрос
-//клиента содержит заголовок Accept со значением "application/json",
-//и тем самым сообщает, что клиент может обрабатывать ответы только
-//в формате JSON.
-
-
-    //так что возможно headers надо убрать
     @CrossOrigin(origins = "http://localhost:5173")
     @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/dot")
     public ResponseEntity<?> options(){
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS, DELETE");
-        responseHeaders.set("Access-Control-Allow-Headers","Content-Type, Authorization");
-        responseHeaders.set("Access-Control-Max-Age","3600");
-        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
-        return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
-    }
-
-    @CrossOrigin(origins = "http://localhost:5173")
-    @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/dots")
-    public ResponseEntity<?> optionsForDots(){
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
         responseHeaders.set("Access-Control-Allow-Headers","Content-Type, Authorization");
@@ -117,4 +86,5 @@ public class MainController {
         responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
     }
+
 }

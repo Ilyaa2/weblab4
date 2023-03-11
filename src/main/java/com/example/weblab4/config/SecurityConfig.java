@@ -33,26 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception{
-        //отключить корс защиту
-        http
-                //.csrf().disable().cors().disable().sessionManagement().disable() - пока работает и без отключения
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS,"/dot").permitAll()
-                .antMatchers("/register").permitAll()
-                .antMatchers("/dot").hasRole(Role.USER.name())
-                .anyRequest()
-                .authenticated()
-                .and().sessionManagement().disable()
-                .logout()
-                .and()
-                .httpBasic();
-                //.formLogin();
-    }
-
-     */
 
     @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
@@ -70,7 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
-                .headers().frameOptions().disable().and()
                 .cors().disable().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -83,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }
 
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -94,4 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+     */
 }

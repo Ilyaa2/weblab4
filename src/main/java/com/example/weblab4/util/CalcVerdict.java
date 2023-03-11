@@ -1,4 +1,4 @@
-package com.example.weblab4;
+package com.example.weblab4.util;
 
 import com.example.weblab4.model.Dot;
 

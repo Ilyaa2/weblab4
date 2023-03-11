@@ -3,6 +3,7 @@ package com.example.weblab4.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,9 +21,10 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User(){
 
-    }
+
+
+    public User(){}
 
     public User(String username, String password){
         this.username = username;

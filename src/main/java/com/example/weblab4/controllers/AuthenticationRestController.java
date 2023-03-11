@@ -59,7 +59,6 @@ public class AuthenticationRestController {
     }
 
     @CrossOrigin(origins = "http://localhost:5173")
-    //@PostMapping(value = "register",consumes = {"*/*"} )
     @PostMapping(value = "register")
     public ResponseEntity<Map<Object,Object>> register(@RequestBody AuthenticationRequestDto requestDto){
         Map<Object, Object> responce = new HashMap<>();
@@ -91,15 +90,6 @@ public class AuthenticationRestController {
     @CrossOrigin(origins = "http://localhost:5173")
     @RequestMapping(method = RequestMethod.OPTIONS, headers = "Accept=application/json", value = "/register")
     public ResponseEntity<?> optionsRegister(){
-        /*
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Access-Control-Allow-Methods","POST, OPTIONS");
-        responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
-        responseHeaders.set("Access-Control-Max-Age","3600");
-        responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:5173");
-        return new ResponseEntity<>(null, responseHeaders, HttpStatus.OK);
-
-         */
         return getResponseEntityForOptions();
     }
 
@@ -111,7 +101,6 @@ public class AuthenticationRestController {
 
     private ResponseEntity<?> getResponseEntityForOptions(){
         HttpHeaders responseHeaders = new HttpHeaders();
-        //responseHeaders.set("Access-Control-Allow-Methods","POST, GET, OPTIONS");
         responseHeaders.set("Access-Control-Allow-Methods","POST, OPTIONS");
         responseHeaders.set("Access-Control-Allow-Headers","Content-Type");
         responseHeaders.set("Access-Control-Max-Age","3600");
