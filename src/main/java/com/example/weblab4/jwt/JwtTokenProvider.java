@@ -82,7 +82,7 @@ public class JwtTokenProvider {
 
 
     public Authentication getAuthentication(String token) {
-        //log.info("My token in getAuthentication : {} ", token);
+        log.info("My token in getAuthentication : {} ", token);
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
 
         // так как в конструкторе мы обозначили привилегии, то используется метод внутри super.setAuthenticated(true); - аутентификация корректна
@@ -97,7 +97,6 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer_")) {
-            //return bearerToken.substring(7, bearerToken.length());
             return bearerToken.substring(7);
         }
         return null;

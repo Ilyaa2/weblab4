@@ -25,6 +25,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/*todo ПРОАНАЛИЗИРУЙ JWT АУТЕНТИФИКАЦИЮ ВНИМАТЕЛЬНЕЕ
+  У ТЕБЯ ИСПОЛЬЗУЕТСЯ JWT ТОКЕН, ЧТО ОЗНАЧАЕТ, ЧТО ОБРАЩЕНИЯ К БД ЧТОБ ВЫЧЛЕНИТЬ ДАННЫЕ О ЮЗЕРЕ И СВЕРИТЬ ИХ НЕ ДОЛЖНО ПРОИСХОДИТЬ.
+ОБРАЩЕНИЕ К БД ЗА ЭТОЙ ЦЕЛЬЮ - УДЕЛ BASIC AUTH
+JWT ТОКЕН НУЖЕН ДЛЯ ТОГО ЧТО ФОРМИРОВАТЬ ЕГО НА СЕРВЕРЕ С ПОМОЩЬЮ СЕКРЕТНОГО КЛЮЧА, А ПОСЛЕ КОГДА ЮЗЕР ЕГО ОТПРАВЛЯЕТ НА СЕРВЕР
+ОПЯТЬ, МЫ СМОТРИМ ПО ПОДПИСИ, ЧТО ТОКЕН СОХРАНИЛ СВОЮ ЦЕЛОСТНОСТЬ
+ */
+
+
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {

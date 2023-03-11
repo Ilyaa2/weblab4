@@ -23,7 +23,11 @@ public class MainController {
 
     private DotRepo dotRepo;
     private UserRepo userRepo;
-    private User user;
+
+    //эту переменную использовали разные методы контроллера. Это большой риск. Приложение многопоточное,
+    //может быть такое что мы ожидали там одно значение в текущем потоке, а в итоге его изменил другой поток.
+    //создавай локальные переменные, пусть не совсем красивый код, но рабочий
+    //private User user;
 
     @Autowired
     public MainController(DotRepo dotRepo, UserRepo userRepo){
@@ -32,9 +36,9 @@ public class MainController {
     }
 
 
-    private void setUser(){
+    private User getUser(){
         UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        this.user = userRepo.findById(((JwtUser) user.getPrincipal()).getId()).get();
+        return userRepo.findById(((JwtUser) user.getPrincipal()).getId()).get();
     }
 
 
@@ -42,8 +46,7 @@ public class MainController {
     @PostMapping(value = "dot",consumes="application/json")
     @ResponseBody
     public ResponseEntity<Dot> saveDot(@RequestBody Dot dot){
-        setUser();
-
+        User user = getUser();
         dot.setUser(user);
         dot.setVerdict(CalcVerdict.calculate(dot));
         try {
@@ -58,7 +61,7 @@ public class MainController {
     @GetMapping(value = "dot/{rad}",produces = "application/json")
     @ResponseBody
     public ResponseEntity<List<Dot>> getDotsById(@PathVariable("rad") double r){
-        setUser();
+        User user = getUser();
         try {
             return new ResponseEntity<>(dotRepo.findByUserAndR(user, r), HttpStatus.OK);
         } catch (Exception e){
@@ -71,8 +74,7 @@ public class MainController {
     @GetMapping(value = "dot",produces = "application/json")
     @ResponseBody
     public List<Dot> getAllDots(){
-        setUser();
-        return dotRepo.findByUser(user);
+        return dotRepo.findByUser(getUser());
     }
 
 

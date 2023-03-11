@@ -64,8 +64,15 @@ public class AuthenticationRestController {
         Map<Object, Object> responce = new HashMap<>();
         try{
             String username = requestDto.getUsername();
+            //todo во-первых ручная проверка на то, что пользователь с таким именем уже регистрирован - большой риск
+            // приложение многопоточное и сразу после того, как проверка показала, что все хорошо, сразу же после этого,
+            // клиент с таким же именем уже может регистрироваться.
+            // в таком случае, лучше полагаться на бд, указав там unique напротив name и ждать пока она вернет exception
+            // внизу я как раз его обрабатываю, так что нужно эту проверку ручную убрать. БД специально делают таким образом,
+            // что они отказоустойчивые в плане многопоточки.
             User user = userService.findByUsername(username);
 
+            //todo во-вторых выбрасывать ексепшн и тут же его обрабатывать - моветон
             if (user != null){
                 throw new UsernameAlreadyExistsException("A user with the same name already exists");
             }
